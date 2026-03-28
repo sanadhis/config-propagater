@@ -19,12 +19,14 @@ package utils
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
 
 	. "github.com/onsi/ginkgo/v2" // nolint:revive,staticcheck
+	ctrlclient "sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
@@ -251,4 +253,25 @@ func UncommentCode(filename, target, prefix string) error {
 	}
 
 	return nil
+}
+
+type ErrorClient struct {
+	ctrlclient.Client
+	Err error
+}
+
+func (c *ErrorClient) Get(ctx context.Context, key ctrlclient.ObjectKey,
+	obj ctrlclient.Object, opts ...ctrlclient.GetOption) error {
+	if c.Err == nil {
+		return c.Client.Get(ctx, key, obj, opts...)
+	}
+	return c.Err
+}
+
+func (c *ErrorClient) List(ctx context.Context, objectList ctrlclient.ObjectList,
+	listOptions ...ctrlclient.ListOption) error {
+	if c.Err == nil {
+		return c.Client.List(ctx, objectList, listOptions...)
+	}
+	return c.Err
 }
