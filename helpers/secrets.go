@@ -13,11 +13,11 @@ func IsSecretManagedByController(secret *corev1.Secret) bool {
 	return IsManagedByPropagationController(secret.Labels)
 }
 
-func HasSecretPropagationAnnotation(secret *corev1.Secret) bool {
+func EnabledPropagationFromSecretAnnotation(secret *corev1.Secret) bool {
 	return hasPropagationEnabledAnnotation(secret.Annotations)
 }
 
-func GetSecretPropagationNamespaceAnnotation(secret *corev1.Secret) []string {
+func GetPropagationNamespaceFromSecretAnnotation(secret *corev1.Secret) []string {
 	return getPropagationNamespacesFromAnnotations(secret.Annotations)
 }
 

@@ -90,6 +90,10 @@ var _ = Describe("Manager", Ordered, func() {
 		By("removing manager namespace")
 		cmd = exec.Command("kubectl", "delete", "ns", namespace)
 		_, _ = utils.Run(cmd)
+
+		By("removing samples secrets & configmaps")
+		cmd = exec.Command("kubectl", "delete", "-k", "./config/samples/")
+		_, _ = utils.Run(cmd)
 	})
 
 	// After each test, check for failures and collect logs, events,
@@ -246,14 +250,95 @@ var _ = Describe("Manager", Ordered, func() {
 
 		// +kubebuilder:scaffold:e2e-webhooks-checks
 
-		// TODO: Customize the e2e test suite with scenarios specific to your project.
-		// Consider applying sample/CR(s) and check their status and/or verifying
-		// the reconciliation by using the metrics, i.e.:
-		// metricsOutput := getMetricsOutput()
-		// Expect(metricsOutput).To(ContainSubstring(
-		//    fmt.Sprintf(`controller_runtime_reconcile_total{controller="%s",result="success"} 1`,
-		//    strings.ToLower(<Kind>),
-		// ))
+		It("should propagate secret", func() {
+			By("creating secrets")
+			createSecret := func(g Gomega) {
+				cmd := exec.Command("kubectl", "create", "-f", "./config/samples/secret-example.yaml")
+				output, err := utils.Run(cmd)
+				g.Expect(err).NotTo(HaveOccurred())
+				g.Expect(output).To(ContainSubstring("secret/config-propagator-propagate-1 created"))
+				g.Expect(output).To(ContainSubstring("secret/config-propagator-propagate-2 created"))
+				g.Expect(output).To(ContainSubstring("secret/config-propagator-do-not-propagate created"))
+			}
+			Eventually(createSecret).Should(Succeed())
+
+			By("verifying secrets 1 propagation")
+			checkSecret1 := func(g Gomega) {
+				cmd1 := exec.Command("sh", "-c", "kubectl get namespace --no-headers | wc -l")
+				count1, err := utils.Run(cmd1)
+				g.Expect(err).NotTo(HaveOccurred())
+
+				cmd2 := exec.Command("sh", "-c", "kubectl get secret -A | grep config-propagator-propagate-1 | wc -l")
+				count2, err := utils.Run(cmd2)
+
+				g.Expect(err).NotTo(HaveOccurred())
+				g.Expect(count1).To(Equal(count2))
+			}
+			Eventually(checkSecret1).Should(Succeed())
+
+			By("verifying secrets 2 propagation")
+			checkSecret2 := func(g Gomega) {
+				cmd := exec.Command("sh", "-c", "kubectl get secret -A | grep config-propagator-propagate-2 | wc -l")
+				output, err := utils.Run(cmd)
+				g.Expect(err).NotTo(HaveOccurred())
+				g.Expect(output).To(ContainSubstring("2"))
+			}
+			Eventually(checkSecret2).Should(Succeed())
+
+			By("verifying no secrets propagation")
+			checkSecret3 := func(g Gomega) {
+				cmd := exec.Command("sh", "-c", "kubectl get secret -A | grep config-propagator-do-not-propagate | wc -l")
+				output, err := utils.Run(cmd)
+				g.Expect(err).NotTo(HaveOccurred())
+				g.Expect(output).To(ContainSubstring("1"))
+			}
+			Eventually(checkSecret3).Should(Succeed())
+		})
+
+		It("should propagate configmaps", func() {
+			By("creating configmaps")
+			createConfigMap := func(g Gomega) {
+				cmd := exec.Command("kubectl", "create", "-f", "./config/samples/configmap-example.yaml")
+				output, err := utils.Run(cmd)
+				g.Expect(err).NotTo(HaveOccurred())
+				g.Expect(output).To(ContainSubstring("configmap/config-propagator-propagate-1 created"))
+				g.Expect(output).To(ContainSubstring("configmap/config-propagator-propagate-2 created"))
+				g.Expect(output).To(ContainSubstring("configmap/config-propagator-do-not-propagate created"))
+			}
+			Eventually(createConfigMap).Should(Succeed())
+
+			By("verifying configmap 1 propagation")
+			checkConfigMap1 := func(g Gomega) {
+				cmd1 := exec.Command("sh", "-c", "kubectl get namespace --no-headers | wc -l")
+				count1, err := utils.Run(cmd1)
+				g.Expect(err).NotTo(HaveOccurred())
+
+				cmd2 := exec.Command("sh", "-c", "kubectl get configmap -A | grep config-propagator-propagate-1 | wc -l")
+				count2, err := utils.Run(cmd2)
+
+				g.Expect(err).NotTo(HaveOccurred())
+				g.Expect(count1).To(Equal(count2))
+			}
+			Eventually(checkConfigMap1).Should(Succeed())
+
+			By("verifying configmap 2 propagation")
+			checkConfigMap2 := func(g Gomega) {
+				cmd := exec.Command("sh", "-c", "kubectl get configmap -A | grep config-propagator-propagate-2 | wc -l")
+				output, err := utils.Run(cmd)
+				g.Expect(err).NotTo(HaveOccurred())
+				g.Expect(output).To(ContainSubstring("2"))
+			}
+			Eventually(checkConfigMap2).Should(Succeed())
+
+			By("verifying no configmap propagation")
+			checkConfigMap3 := func(g Gomega) {
+				cmd := exec.Command("sh", "-c", "kubectl get configmap -A | grep config-propagator-do-not-propagate | wc -l")
+				output, err := utils.Run(cmd)
+				g.Expect(err).NotTo(HaveOccurred())
+				g.Expect(output).To(ContainSubstring("1"))
+			}
+			Eventually(checkConfigMap3).Should(Succeed())
+		})
 	})
 })
 

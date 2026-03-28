@@ -13,11 +13,11 @@ func IsConfigMapManagedByController(configmap *corev1.ConfigMap) bool {
 	return IsManagedByPropagationController(configmap.Labels)
 }
 
-func HasConfigMapPropagationAnnotation(configmap *corev1.ConfigMap) bool {
+func EnabledPropagationFromConfigMapAnnotation(configmap *corev1.ConfigMap) bool {
 	return hasPropagationEnabledAnnotation(configmap.Annotations)
 }
 
-func GetConfigMapPropagationNamespaceAnnotation(configmap *corev1.ConfigMap) []string {
+func GetPropagationNamespaceFromConfigMapAnnotation(configmap *corev1.ConfigMap) []string {
 	return getPropagationNamespacesFromAnnotations(configmap.Annotations)
 }
 

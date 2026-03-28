@@ -37,7 +37,7 @@ func (r *SecretsController) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, r.handleDeletion(ctx, o)
 	}
 
-	if !helpers.HasSecretPropagationAnnotation(o) {
+	if !helpers.EnabledPropagationFromSecretAnnotation(o) {
 		logger.V(2).Info("Secret does not have propagation annotation, skipping",
 			"secret", o.Name, "namespace", o.Namespace)
 		return ctrl.Result{}, nil
@@ -50,10 +50,11 @@ func (r *SecretsController) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	var namespaces []string
-	if len(helpers.GetSecretPropagationNamespaceAnnotation(o)) > 0 {
-		namespaces = helpers.GetSecretPropagationNamespaceAnnotation(o)
+	if len(helpers.GetPropagationNamespaceFromSecretAnnotation(o)) > 0 {
+		namespaces = helpers.GetPropagationNamespaceFromSecretAnnotation(o)
 	} else {
-		namespaces, err := helpers.GetAllNamespaces(ctx, r.Client)
+		var err error
+		namespaces, err = helpers.GetAllNamespaces(ctx, r.Client)
 		if namespaces == nil || err != nil {
 			logger.Error(err, "Failed to list namespaces")
 			return ctrl.Result{}, err

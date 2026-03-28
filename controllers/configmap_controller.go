@@ -37,7 +37,7 @@ func (r *ConfigMapController) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, r.handleDeletion(ctx, o)
 	}
 
-	if !helpers.HasConfigMapPropagationAnnotation(o) {
+	if !helpers.EnabledPropagationFromConfigMapAnnotation(o) {
 		logger.V(2).Info("Secret does not have propagation annotation, skipping",
 			"configmap", o.Name, "namespace", o.Namespace)
 		return ctrl.Result{}, nil
@@ -50,8 +50,8 @@ func (r *ConfigMapController) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 
 	var namespaces []string
-	if len(helpers.GetConfigMapPropagationNamespaceAnnotation(o)) > 0 {
-		namespaces = helpers.GetConfigMapPropagationNamespaceAnnotation(o)
+	if len(helpers.GetPropagationNamespaceFromConfigMapAnnotation(o)) > 0 {
+		namespaces = helpers.GetPropagationNamespaceFromConfigMapAnnotation(o)
 	} else {
 		var err error
 		namespaces, err = helpers.GetAllNamespaces(ctx, r.Client)
