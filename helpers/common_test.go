@@ -151,7 +151,7 @@ func Test_getObjectIfExists(t *testing.T) {
 				Client: fake.NewClientBuilder().
 					WithScheme(scheme).
 					Build(),
-				Err: errors.New("object not found"),
+				GetErr: errors.New("object not found"),
 			},
 			key:     ctrlclient.ObjectKey{Name: "non-existing-configmap", Namespace: "default"},
 			obj:     &corev1.ConfigMap{},

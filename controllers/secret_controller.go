@@ -12,12 +12,12 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
-type SecretsController struct {
+type SecretController struct {
 	client.Client
 	Scheme *runtime.Scheme
 }
 
-func (r *SecretsController) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *SecretController) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
 	o := &corev1.Secret{}
@@ -83,11 +83,11 @@ func (r *SecretsController) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	return ctrl.Result{}, nil
 }
 
-func (r *SecretsController) handleDeletion(ctx context.Context, secret *corev1.Secret) error {
+func (r *SecretController) handleDeletion(ctx context.Context, secret *corev1.Secret) error {
 	return nil
 }
 
-func (r *SecretsController) SetupWithManager(mgr ctrl.Manager) error {
+func (r *SecretController) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1.Secret{}).
 		Complete(r)

@@ -46,7 +46,7 @@ func Test_getAllNamespaces(t *testing.T) {
 					WithScheme(scheme).
 					WithLists(existing).
 					Build(),
-				Err: nil,
+				ListErr: nil,
 			},
 			expected: 2,
 			wantErr:  nil,
@@ -56,7 +56,7 @@ func Test_getAllNamespaces(t *testing.T) {
 				Client: fake.NewClientBuilder().
 					WithScheme(scheme).
 					Build(),
-				Err: errors.New("failed to list namespaces"),
+				ListErr: errors.New("failed to list namespaces"),
 			},
 			expected: 0,
 			wantErr:  errors.New("failed to list namespaces"),

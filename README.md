@@ -1,4 +1,4 @@
-# config-propagator
+# k8s-config-propagator
 K8s operator that address common needs in multi-namespaces cluster management: propagating common secret/configmap among namespaces.
 Example use case:
 - propagating CA trust certificates to all namespaces in the cluster.

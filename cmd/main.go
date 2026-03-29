@@ -113,7 +113,7 @@ func main() {
 	}
 
 	// secrets controller
-	if err = (&controllers.SecretsController{
+	if err = (&controllers.SecretController{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
