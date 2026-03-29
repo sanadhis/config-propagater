@@ -257,21 +257,22 @@ func UncommentCode(filename, target, prefix string) error {
 
 type ErrorClient struct {
 	ctrlclient.Client
-	Err error
+	GetErr  error
+	ListErr error
 }
 
 func (c *ErrorClient) Get(ctx context.Context, key ctrlclient.ObjectKey,
 	obj ctrlclient.Object, opts ...ctrlclient.GetOption) error {
-	if c.Err == nil {
+	if c.GetErr == nil {
 		return c.Client.Get(ctx, key, obj, opts...)
 	}
-	return c.Err
+	return c.GetErr
 }
 
 func (c *ErrorClient) List(ctx context.Context, objectList ctrlclient.ObjectList,
 	listOptions ...ctrlclient.ListOption) error {
-	if c.Err == nil {
+	if c.ListErr == nil {
 		return c.Client.List(ctx, objectList, listOptions...)
 	}
-	return c.Err
+	return c.ListErr
 }

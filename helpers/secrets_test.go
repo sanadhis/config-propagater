@@ -176,7 +176,7 @@ func Test_EnsureSecretExist(t *testing.T) {
 				Client: fake.NewClientBuilder().
 					WithScheme(scheme).
 					Build(),
-				Err: errors.New("object not found"),
+				GetErr: errors.New("object not found"),
 			},
 			secret:          existing,
 			targetNamespace: "not-existing",
