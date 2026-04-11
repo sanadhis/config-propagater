@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/sanadhis/config-propagator/helpers"
+	"golang.org/x/sync/errgroup"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -14,7 +15,8 @@ import (
 
 type ConfigMapController struct {
 	client.Client
-	Scheme *runtime.Scheme
+	Scheme           *runtime.Scheme
+	ConcurrencyLimit int
 }
 
 func (r *ConfigMapController) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
@@ -61,23 +63,40 @@ func (r *ConfigMapController) Reconcile(ctx context.Context, req ctrl.Request) (
 		}
 	}
 
-	for _, ns := range namespaces {
-		if ns == o.Namespace {
-			logger.Info("ConfigMap is in the same namespace as the Namespace, skipping",
-				"configmap", o.Name, "namespace", ns)
-			continue
-		}
-		if ok, err := helpers.VerifyNamespaceExists(ctx, r.Client, ns); !ok || err != nil {
-			logger.Info("[WARNING] Namespace does not exist or failed to get, skipping",
-				"namespace", ns)
-			continue
-		}
+	var g errgroup.Group
+	if r.ConcurrencyLimit > 0 {
+		g.SetLimit(r.ConcurrencyLimit)
+	} else {
+		// Default to a reasonable concurrency limit if not set
+		g.SetLimit(10)
+	}
 
-		if err := helpers.EnsureConfigMapInNamespace(ctx, r.Client, o, ns); err != nil {
-			logger.Error(err, "Failed to ensure ConfigMap in namespace",
-				"configmap", o.Name, "namespace", ns)
-			return ctrl.Result{}, err
-		}
+	for _, ns := range namespaces {
+		g.Go(func() error {
+			if ns == o.Namespace {
+				logger.Info("ConfigMap is in the same namespace as the Namespace, skipping",
+					"configmap", o.Name, "namespace", ns)
+				return nil
+			}
+
+			if ok, err := helpers.VerifyNamespaceExists(ctx, r.Client, ns); !ok || err != nil {
+				logger.Info("[WARNING] Namespace does not exist or failed to get, skipping",
+					"namespace", ns)
+				return nil
+			}
+
+			if err := helpers.EnsureConfigMapInNamespace(ctx, r.Client, o, ns); err != nil {
+				logger.Error(err, "Failed to ensure ConfigMap in namespace",
+					"configmap", o.Name, "namespace", ns)
+				return err
+			}
+
+			return nil
+		})
+	}
+
+	if err := g.Wait(); err != nil {
+		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil
