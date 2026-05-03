@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.3](https://github.com/sanadhis/k8s-config-propagater/compare/v1.0.2...v1.0.3) (2026-05-03)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/onsi/ginkgo/v2 to v2.28.3 ([#37](https://github.com/sanadhis/k8s-config-propagater/issues/37)) ([25dce2c](https://github.com/sanadhis/k8s-config-propagater/commit/25dce2ca4ebe66ce3f4f469112d98f92d5a7d9fe))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.24.0 ([#39](https://github.com/sanadhis/k8s-config-propagater/issues/39)) ([e926336](https://github.com/sanadhis/k8s-config-propagater/commit/e92633661c5abbb55bf941f2a467b1cd9407fa82))
+
 ## [1.0.2](https://github.com/sanadhis/k8s-config-propagater/compare/v1.0.1...v1.0.2) (2026-04-21)
 
 
