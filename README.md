@@ -41,13 +41,13 @@ see the sample in `config/samples` for more details.
 **Build and push your image to the location specified by `IMG`:**
 
 ```sh
-make docker-build docker-push IMG=docker.io/sanadhis/config-propagator:local
+make docker-build docker-push IMG=ghcr.io/sanadhis/config-propagator:local
 ```
 
 **Deploy the Manager to the cluster with the image specified by `IMG`:**
 
 ```sh
-make deploy IMG=docker.io/sanadhis/config-propagator:local
+make deploy IMG=ghcr.io/sanadhis/config-propagator:local
 ```
 
 > **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin
@@ -82,7 +82,7 @@ Following the options to release and provide this solution to the users.
 1. Build the installer for the image built and published in the registry:
 
 ```sh
-make build-installer IMG=docker.io/sanadhis/config-propagator:tag
+make build-installer IMG=ghcr.io/sanadhis/config-propagator:tag
 ```
 
 **NOTE:** The makefile target mentioned above generates an 'install.yaml'
