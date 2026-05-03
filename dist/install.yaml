@@ -210,7 +210,7 @@ spec:
         - --health-probe-bind-address=:8081
         command:
         - /manager
-        image: docker.io/sanadhis/config-propagator:0.1
+        image: ghcr.io/sanadhis/config-propagator:0.1
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
