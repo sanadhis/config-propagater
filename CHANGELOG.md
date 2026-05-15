@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.4](https://github.com/sanadhis/k8s-config-propagater/compare/v1.0.3...v1.0.4) (2026-05-15)
+
+
+### Bug Fixes
+
+* **deps:** update kubernetes monorepo to v0.36.1 ([#43](https://github.com/sanadhis/k8s-config-propagater/issues/43)) ([c399875](https://github.com/sanadhis/k8s-config-propagater/commit/c399875e92d29b0597fd60391b3809bb7a2270da))
+* **deps:** update module sigs.k8s.io/controller-runtime to v0.24.1 ([#42](https://github.com/sanadhis/k8s-config-propagater/issues/42)) ([38f19e6](https://github.com/sanadhis/k8s-config-propagater/commit/38f19e64f89380a54010f2c2afcaa9bdb8b743a6))
+
 ## [1.0.3](https://github.com/sanadhis/k8s-config-propagater/compare/v1.0.2...v1.0.3) (2026-05-03)
 
 
